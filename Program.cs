@@ -10,7 +10,7 @@ namespace WorldTens
         public static int screenHeight = 480;
         public static int iterations = 0;
         public static int iterTmp = 0;
-        public static int iterMax = 10;
+        public static int iterMax = 50;
         static void Main(string[] args)
         {
             Raylib.InitWindow(screenWidth, screenHeight, "WorldTens");
@@ -18,13 +18,13 @@ namespace WorldTens
             world.LoadMap("resources/default.bmp");
 
             Random random = new Random();
-            for (int i = 0; i < 100; i++) {
-                Creation creation = new Creation(new Vector2(235, 140), 10);
+            for (int i = 0; i < 200; i++) {
+                Creation creation = new Creation(new Vector2(265, 140), 10);
                 world.detectors[0].creations.Add(creation);
                 
             }
             
-            for (int i = 0; i < 50; i++) {
+            for (int i = 0; i < 250; i++) {
                 Creation creation = new Creation(new Vector2(250, 150), 10);
                 creation.politStatus = PoliticalStatus.Builder;
                 world.detectors[0].creations.Add(creation);
@@ -35,7 +35,7 @@ namespace WorldTens
 
                 Raylib.BeginDrawing();
 
-                if (iterTmp > iterMax) {
+                if (iterTmp >= iterMax) {
                     Raylib.ClearBackground(Color.WHITE);
                     for (int i = 0; i < world.map.Count; i++) {
                         for (int j = 0; j < world.map[i].Count; j++) {
@@ -51,9 +51,10 @@ namespace WorldTens
                 for (int i = 0; i < world.detectors.Count; i++) {
                     for (int j = 0; j < world.detectors[i].creations.Count; j++) {
                         Creation creation = world.detectors[i].creations[j];
-                        Vector2 prevPos = creation.position;
+                        Vector2 prevPos = new Vector2(creation.position.x, creation.position.y);
                         creation.DoAction(Raylib.GetFrameTime(), world);
                         world.DrawMapPixel(prevPos);
+                        
                         world.DrawMapPixel(creation.position);
 
                         if (creation.alive) {
