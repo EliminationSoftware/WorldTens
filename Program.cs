@@ -1,35 +1,43 @@
 ﻿using System;
 using Raylib_cs;
+
 using WorldTens.Map;
+using WorldTens;
 
 namespace WorldTens
 {
     class Program
     {
-        public static int screenWidth = 800;
-        public static int screenHeight = 480;
+        public static int screenWidth;
+        public static int screenHeight;
         public static uint iterations = 0;
-        public static int iterTmp = 0;
-        public static int iterMax = 200;
+        public static uint iterTmp = 0;
+        public static uint iterMax = 200;
+
         static void Main(string[] args)
         {
-            Raylib.InitWindow(screenWidth, screenHeight, "WorldTens");
-            World world = new World();
-            world.LoadMap("resources/default.bmp");
+            string modelName = args.Length > 0 ? args[0] : "default";
 
-            Random random = new Random();
-            for (int i = 0; i < 200; i++) {
-                Creation creation = new Creation(new Vector2(265, 140), 10);
-                world.detectors[0].creations.Add(creation);
-                
+            World world = new World("resources/models/" + modelName + "/map.bmp");
+            screenWidth = world.GetMapWidth();
+            screenHeight = world.GetMapHeight();
+            Raylib.InitWindow(screenWidth, screenHeight, "WorldTens");
+
+            string spawnYaml = System.IO.File.ReadAllText("resources/models/" + modelName + "/spawn.yml");
+            var deserializer = new YamlDotNet.Serialization.Deserializer();
+            CreationSet[] creationSets = deserializer.Deserialize<CreationSet[]>(spawnYaml);
+
+            for (int i = 0; i < creationSets.Length; i++) {
+                for (int j = 0; j < creationSets[i].count; j++) {
+                    Creation creation = new Creation(new Vector2(
+                        creationSets[i].posX, creationSets[i].posY
+                    ), creationSets[i].mind);
+
+                    creation.politStatus = creationSets[i].politStatus;
+                    world.detectors[0].creations.Add(creation);
+                }
             }
-            
-            for (int i = 0; i < 250; i++) {
-                Creation creation = new Creation(new Vector2(250, 150), 10);
-                creation.politStatus = PoliticalStatus.Builder;
-                world.detectors[0].creations.Add(creation);
-            }
-            
+
             while (!Raylib.WindowShouldClose()) {
                 world.DecreaseTens(Raylib.GetFrameTime());
 

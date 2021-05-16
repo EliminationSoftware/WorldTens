@@ -12,8 +12,13 @@ namespace WorldTens
         private float tensionFallTime = 1.0f;
         private float tensionFallAmount = 0.01f;
         private float speed = 1f;
+        private Bitmap bmp;
         public List<List<MapPixel>> map = new List<List<MapPixel>>();
         public List<MapDetectorSquare> detectors = new List<MapDetectorSquare>();
+
+        public World(string path) {
+            LoadMap(path);
+        }
 
         public void IncreaseTens(float amount) {
             tension += amount;
@@ -33,6 +38,14 @@ namespace WorldTens
             return tension;
         }
 
+        public int GetMapWidth() {
+            return bmp == null ? 0 : bmp.Width;
+        }
+
+        public int GetMapHeight() {
+            return bmp == null ? 0 : bmp.Height;
+        }
+
         public void IncreaseTime() {
             speed *= 2;
         }
@@ -42,7 +55,7 @@ namespace WorldTens
         }
 
         public void LoadMap(string path) {
-            Bitmap bmp = new Bitmap(path);
+            bmp = new Bitmap(path);
             bmp.RotateFlip(RotateFlipType.RotateNoneFlipNone);
 
             MapColor ground = new MapColor(0, 255, 0);
@@ -66,8 +79,8 @@ namespace WorldTens
                     }
                 }
             }
-            for (int i = 0; i < bmp.Height; i += 20) {
-                for (int j = 0; j < bmp.Width; j += 20) {
+            for (int i = 0; i < bmp.Width; i += 20) {
+                for (int j = 0; j < bmp.Height; j += 20) {
                     detectors.Add(new MapDetectorSquare(new Vector2(i, j)));
                 }
             }
