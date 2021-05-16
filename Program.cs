@@ -26,7 +26,7 @@ namespace WorldTens
                 creation.politStatus = PoliticalStatus.Builder;
                 world.detectors[0].creations.Add(creation);
             }
-
+           
             Raylib.SetTargetFPS(60);
             
             while (!Raylib.WindowShouldClose()) {
@@ -70,7 +70,10 @@ namespace WorldTens
                 }
                 Raylib.DrawText("Good luck in WorldTens!", 10, 10, 14, Color.BLACK);
                 Raylib.DrawText(world.GetTension().ToString(), screenWidth - 100, 10, 20, Color.BLACK);
-                
+                if(Raylib.IsKeyDown(KeyboardKey.KEY_F))
+                {
+                    Raylib.DrawText("FPS: " + Raylib.GetFPS().ToString(), 350, 0, 20, Color.BLACK);
+                }
                 Raylib.EndDrawing();
             }
 
