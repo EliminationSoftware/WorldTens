@@ -8,7 +8,7 @@ namespace WorldTens
     {
         public static int screenWidth = 800;
         public static int screenHeight = 480;
-        public static int iterations = 0;
+        public static uint iterations = 0;
         public static int iterTmp = 0;
         public static int iterMax = 200;
         static void Main(string[] args)
@@ -35,7 +35,7 @@ namespace WorldTens
 
                 Raylib.BeginDrawing();
 
-                if (iterTmp >= iterMax) {
+                if (iterTmp >= iterMax || iterations == 0) {
                     Raylib.ClearBackground(Color.WHITE);
                     for (int i = 0; i < world.map.Count; i++) {
                         for (int j = 0; j < world.map[i].Count; j++) {
