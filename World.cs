@@ -2,6 +2,7 @@ using System.Drawing;
 using System.Collections.Generic;
 using WorldTens.Map;
 using System;
+using Raylib_cs;
 
 namespace WorldTens
 {
@@ -70,6 +71,23 @@ namespace WorldTens
                     detectors.Add(new MapDetectorSquare(new Vector2(i, j)));
                 }
             }
+        }
+
+        public void DrawMapPixel(Vector2 pos) {
+            MapPixel pixel = map[pos.x][pos.y];
+            if (pixel.grass) {
+                Raylib.DrawPixel(pos.x, pos.y, Raylib_cs.Color.GREEN);
+            }
+            else if (pixel.water) {
+                Raylib.DrawPixel(pos.x, pos.y, Raylib_cs.Color.BLUE);
+            }
+            if (pixel.city) {
+                Raylib.DrawPixel(pos.x, pos.y, Raylib_cs.Color.BLACK);
+            }
+            else if (pixel.road) {
+                Raylib.DrawPixel(pos.x, pos.y, Raylib_cs.Color.GRAY);
+            }
+            pixel = null;
         }
     }
 }

@@ -8,6 +8,9 @@ namespace WorldTens
     {
         public static int screenWidth = 800;
         public static int screenHeight = 480;
+        public static int iterations = 0;
+        public static int iterTmp = 0;
+        public static int iterMax = 10;
         static void Main(string[] args)
         {
             Raylib.InitWindow(screenWidth, screenHeight, "WorldTens");
@@ -26,38 +29,32 @@ namespace WorldTens
                 creation.politStatus = PoliticalStatus.Builder;
                 world.detectors[0].creations.Add(creation);
             }
-           
-            Raylib.SetTargetFPS(60);
             
             while (!Raylib.WindowShouldClose()) {
                 world.DecreaseTens(Raylib.GetFrameTime());
 
                 Raylib.BeginDrawing();
-                Raylib.ClearBackground(Color.WHITE);
 
-                for (int i = 0; i < world.map.Count; i++) {
-                    for (int j = 0; j < world.map[i].Count; j++) {
-                        MapPixel pixel = world.map[i][j];
-                        if (pixel.grass) {
-                            Raylib.DrawPixel(i, j, Color.GREEN);
+                if (iterTmp > iterMax) {
+                    Raylib.ClearBackground(Color.WHITE);
+                    for (int i = 0; i < world.map.Count; i++) {
+                        for (int j = 0; j < world.map[i].Count; j++) {
+                            world.DrawMapPixel(new Vector2(i, j));
                         }
-                        else if (pixel.water) {
-                            Raylib.DrawPixel(i, j, Color.BLUE);
-                        }
-                        if (pixel.city) {
-                            Raylib.DrawPixel(i, j, Color.BLACK);
-                        }
-                        else if (pixel.road) {
-                            Raylib.DrawPixel(i, j, Color.GRAY);
-                        }
-                        pixel = null;
                     }
+                    Raylib.DrawText("Good luck in WorldTens!", 10, 10, 14, Color.BLACK);
+                    Raylib.DrawText(iterations.ToString(), 0, screenHeight - 20, 20, Color.BLACK);
+                    Raylib.DrawText(world.GetTension().ToString(), screenWidth - 100, 10, 20, Color.BLACK);
+                    iterTmp = 0;
                 }
 
                 for (int i = 0; i < world.detectors.Count; i++) {
                     for (int j = 0; j < world.detectors[i].creations.Count; j++) {
                         Creation creation = world.detectors[i].creations[j];
+                        Vector2 prevPos = creation.position;
                         creation.DoAction(Raylib.GetFrameTime(), world);
+                        world.DrawMapPixel(prevPos);
+                        world.DrawMapPixel(creation.position);
 
                         if (creation.alive) {
                             Raylib.DrawPixel(creation.position.x, creation.position.y, Color.RED);
@@ -68,8 +65,8 @@ namespace WorldTens
                         }
                     }
                 }
-                Raylib.DrawText("Good luck in WorldTens!", 10, 10, 14, Color.BLACK);
-                Raylib.DrawText(world.GetTension().ToString(), screenWidth - 100, 10, 20, Color.BLACK);
+                iterations++;
+                iterTmp++;
                 if(Raylib.IsKeyDown(KeyboardKey.KEY_F))
                 {
                     Raylib.DrawText("FPS: " + Raylib.GetFPS().ToString(), 350, 0, 20, Color.BLACK);
