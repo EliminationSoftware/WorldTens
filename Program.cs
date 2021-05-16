@@ -1,6 +1,8 @@
 ﻿using System;
 using Raylib_cs;
+
 using WorldTens.Map;
+using WorldTens;
 
 namespace WorldTens
 {
@@ -14,23 +16,28 @@ namespace WorldTens
 
         static void Main(string[] args)
         {
-            World world = new World("resources/rivers.bmp");
+            string modelName = args.Length > 0 ? args[0] : "default";
+
+            World world = new World("resources/models/" + modelName + "/map.bmp");
             screenWidth = world.GetMapWidth();
             screenHeight = world.GetMapHeight();
             Raylib.InitWindow(screenWidth, screenHeight, "WorldTens");
 
-            Random random = new Random();
-            for (int i = 0; i < 200; i++) {
-                Creation creation = new Creation(new Vector2(265, 140), 10);
-                world.detectors[0].creations.Add(creation);
+            string spawnYaml = System.IO.File.ReadAllText("resources/models/" + modelName + "/spawn.yml");
+            var deserializer = new YamlDotNet.Serialization.Deserializer();
+            CreationSet[] creationSets = deserializer.Deserialize<CreationSet[]>(spawnYaml);
+
+            for (int i = 0; i < creationSets.Length; i++) {
+                for (int j = 0; j < creationSets[i].count; j++) {
+                    Creation creation = new Creation(new Vector2(
+                        creationSets[i].posX, creationSets[i].posY
+                    ), creationSets[i].mind);
+
+                    creation.politStatus = creationSets[i].politStatus;
+                    world.detectors[0].creations.Add(creation);
+                }
             }
-            
-            for (int i = 0; i < 250; i++) {
-                Creation creation = new Creation(new Vector2(250, 150), 10);
-                creation.politStatus = PoliticalStatus.Builder;
-                world.detectors[0].creations.Add(creation);
-            }
-            
+
             while (!Raylib.WindowShouldClose()) {
                 world.DecreaseTens(Raylib.GetFrameTime());
 
