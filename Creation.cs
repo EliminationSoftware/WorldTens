@@ -89,16 +89,7 @@ namespace WorldTens
             switch (status) {
                 case AIStatus.Move:
                     if (politStatus == PoliticalStatus.Civilian) {
-                        Vector2 cityPos = SearchCity(world);
-                        Vector2 directionCity;
-                        if (cityPos != null) {
-                            directionCity = GetDirection(cityPos);
-                        }
-                        else {
-                            directionCity = new Vector2(random.Next(-1, 2), random.Next(-1, 2));
-                        }
-                        position.x += directionCity.x;
-                        position.y += directionCity.y;
+                        MoveToCity(world);
                     }
                     else if (politStatus == PoliticalStatus.Builder) {
                         position.x += random.Next(-1, 2);
@@ -128,8 +119,25 @@ namespace WorldTens
                     if (world.map[position.x][position.y].city) {
                         full += eatSpeed * delta;
                     }
+                    else {
+                        MoveToCity(world);
+                    }
                     break;
             }
+        }
+
+        private void MoveToCity(World world) {
+            Random random = new Random();
+            Vector2 cityPos = SearchCity(world);
+            Vector2 directionCity;
+            if (cityPos != null) {
+                directionCity = GetDirection(cityPos);
+            }
+            else {
+                directionCity = new Vector2(random.Next(-1, 2), random.Next(-1, 2));
+            }
+            position.x += directionCity.x;
+            position.y += directionCity.y;
         }
 
         private Vector2 GetDirection(Vector2 targetPos) {
