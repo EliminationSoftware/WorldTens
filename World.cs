@@ -66,8 +66,8 @@ namespace WorldTens
                     }
                 }
             }
-            for (int i = 0; i < bmp.Height; i += 20) {
-                for (int j = 0; j < bmp.Width; j += 20) {
+            for (int i = 0; i < bmp.Width; i += 20) {
+                for (int j = 0; j < bmp.Height; j += 20) {
                     detectors.Add(new MapDetectorSquare(new Vector2(i, j)));
                 }
             }
