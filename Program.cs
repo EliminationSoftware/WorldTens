@@ -6,7 +6,6 @@ namespace WorldTens
 {
     class Program
     {
-        private bool _fps = false;
         public static int screenWidth = 800;
         public static int screenHeight = 480;
         static void Main(string[] args)
