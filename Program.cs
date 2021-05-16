@@ -6,22 +6,23 @@ namespace WorldTens
 {
     class Program
     {
-        public static int screenWidth = 800;
-        public static int screenHeight = 480;
+        public static int screenWidth;
+        public static int screenHeight;
         public static uint iterations = 0;
-        public static int iterTmp = 0;
-        public static int iterMax = 200;
+        public static uint iterTmp = 0;
+        public static uint iterMax = 200;
+
         static void Main(string[] args)
         {
+            World world = new World("resources/rivers.bmp");
+            screenWidth = world.GetMapWidth();
+            screenHeight = world.GetMapHeight();
             Raylib.InitWindow(screenWidth, screenHeight, "WorldTens");
-            World world = new World();
-            world.LoadMap("resources/default.bmp");
 
             Random random = new Random();
             for (int i = 0; i < 200; i++) {
                 Creation creation = new Creation(new Vector2(265, 140), 10);
                 world.detectors[0].creations.Add(creation);
-                
             }
             
             for (int i = 0; i < 250; i++) {
