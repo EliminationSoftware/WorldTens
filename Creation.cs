@@ -29,11 +29,12 @@ namespace WorldTens
     {
         public Vector2 position = new Vector2(5, 5);
         public float mind = 1.0f;
-        public Vehicle vehicle = new Vehicle(VehicleType.None, 1);
+        public Vehicle vehicle = new Vehicle(VehicleType.None, 100);
         private AIStatus status = AIStatus.Move;
         public PoliticalStatus politStatus = PoliticalStatus.Civilian;
         public bool alive = true;
         private float progress = 0.0f;
+        private float moveProgress = 0.0f;
         private float speedBuid = 15.0f;
         private float full = 100;
         private float eatSpeed = 30;
@@ -92,8 +93,7 @@ namespace WorldTens
                         MoveToCity(world);
                     }
                     else if (politStatus == PoliticalStatus.Builder) {
-                        position.x += random.Next(-1, 2);
-                        position.y += random.Next(-1, 2);
+                        moveOnProgress(new Vector2(random.Next(-1, 2), random.Next(-1, 2)));
                     }
                     full -= 0.05f;
                     break;
@@ -126,6 +126,15 @@ namespace WorldTens
             }
         }
 
+        private void moveOnProgress(Vector2 direction) {
+            moveProgress += vehicle.speed * Raylib.GetFrameTime();
+            if (moveProgress >= 100) {
+                position.x += direction.x;
+                position.y += direction.y;
+                moveProgress -= 100;
+            }
+        }
+
         private void MoveToCity(World world) {
             Random random = new Random();
             Vector2 cityPos = SearchCity(world);
@@ -136,8 +145,7 @@ namespace WorldTens
             else {
                 directionCity = new Vector2(random.Next(-1, 2), random.Next(-1, 2));
             }
-            position.x += directionCity.x;
-            position.y += directionCity.y;
+            moveOnProgress(directionCity);
         }
 
         private Vector2 GetDirection(Vector2 targetPos) {
