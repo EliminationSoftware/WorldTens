@@ -10,7 +10,7 @@ namespace WorldTens
         public static int screenHeight = 480;
         public static int iterations = 0;
         public static int iterTmp = 0;
-        public static int iterMax = 50;
+        public static int iterMax = 200;
         static void Main(string[] args)
         {
             Raylib.InitWindow(screenWidth, screenHeight, "WorldTens");
