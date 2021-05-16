@@ -19,10 +19,11 @@ namespace WorldTens
     }
 
     public enum PoliticalStatus {
-        Army,
+        Soldier,
         Civilian,
         Politic,
         Scientist,
+        Builder,
     }
     public class Creation
     {
@@ -30,9 +31,13 @@ namespace WorldTens
         public float mind = 1.0f;
         public Vehicle vehicle = new Vehicle(VehicleType.None, 1);
         private AIStatus status = AIStatus.Move;
-        private bool alive = false;
+        public PoliticalStatus politStatus = PoliticalStatus.Civilian;
+        public bool alive = true;
         private float progress = 0.0f;
         private float speedBuid = 15.0f;
+        private float full = 100;
+        private float eatSpeed = 30;
+        private int searchRadius = 20;
 
         public Creation() {
 
@@ -44,6 +49,9 @@ namespace WorldTens
         }
 
         public void DoAction(float delta, World world) {
+            if (!alive) {
+                return;
+            }
             // Checks here
             if (world.map[position.x][position.y].water) {
                 status = AIStatus.Move;
@@ -54,33 +62,54 @@ namespace WorldTens
                 status = AIStatus.Follow;
             }
 
-            if (world.map[position.x][position.y].grass && !world.map[position.x][position.y].city) {
+            if (world.map[position.x][position.y].grass && !world.map[position.x][position.y].city && politStatus == PoliticalStatus.Builder) {
                 status = AIStatus.Build;
             }
             else {
-                status = AIStatus.Move;
+                if (creations.Count > 0 && politStatus == PoliticalStatus.Soldier) {
+                    status = AIStatus.Follow;
+                }
+                else {
+                    status = AIStatus.Move;
+                }
+            }
+
+            if (full <= 20 && world.map[position.x][position.y].city) {
+                status = AIStatus.Eat;
+            }
+
+            if (full <= 0) {
+                alive = false;
+                return;
             }
             
             Random random = new Random();
+            int followIndex = random.Next(creations.Count);
             //Actions here
             switch (status) {
                 case AIStatus.Move:
-                    position.x += random.Next(2);
-                    position.y += random.Next(2);
+                    if (politStatus == PoliticalStatus.Civilian) {
+                        Vector2 cityPos = SearchCity(world);
+                        Vector2 directionCity;
+                        if (cityPos != null) {
+                            directionCity = GetDirection(cityPos);
+                        }
+                        else {
+                            directionCity = new Vector2(random.Next(-1, 2), random.Next(-1, 2));
+                        }
+                        position.x += directionCity.x;
+                        position.y += directionCity.y;
+                    }
+                    else if (politStatus == PoliticalStatus.Builder) {
+                        position.x += random.Next(-1, 2);
+                        position.y += random.Next(-1, 2);
+                    }
+                    full -= 0.05f;
                     break;
                 case AIStatus.Follow:
-                    if (position.x < creations[0].position.x) {
-                        position.x -= 1;
-                    }
-                    else {
-                        position.x += 1;
-                    }
-                    if (position.y < creations[0].position.y) {
-                        position.x -= 1;
-                    }
-                    else {
-                        position.y += 1;
-                    }
+                    Vector2 direction = GetDirection(creations[followIndex].position);
+                    position.x += direction.x;
+                    position.y += direction.y;
                     break;
                 case AIStatus.Build:
                     progress += speedBuid * delta;
@@ -91,9 +120,33 @@ namespace WorldTens
                         else {
                             world.map[position.x][position.y].road = true;
                         }
+                        progress = 0;
+                        world.IncreaseTens(0.01f);
+                    }
+                    break;
+                case AIStatus.Eat:
+                    if (world.map[position.x][position.y].city) {
+                        full += eatSpeed * delta;
                     }
                     break;
             }
+        }
+
+        private Vector2 GetDirection(Vector2 targetPos) {
+            Vector2 dir = new Vector2(0, 0);
+            if (position.x < targetPos.x) {
+                dir.x += 1;
+            }
+            else {
+                dir.x -= 1;
+            }
+            if (position.y < targetPos.y) {
+                dir.y += 1;
+            }
+            else {
+                dir.y -= 1;
+            }
+            return dir;
         }
 
         public List<Creation> searchCreations(World world) {
@@ -108,12 +161,41 @@ namespace WorldTens
             for (int i = 0; i < world.detectors.Count; i++) {
                 Rectangle detector = new Rectangle(world.detectors[i].position.x, world.detectors[i].position.y, world.detectors[i].wh.x, world.detectors[i].wh.y);
                 if (Raylib.CheckCollisionPointRec(new System.Numerics.Vector2(position.x, position.y), detector)) {
-                    foreach (Creation creation in world.detectors[i].creations) {
-                        creations.Add(creation);
+                    if (!world.detectors[i].creations.Contains(this)) {
+                        world.detectors[i].creations.Add(this);
                     }
+                    foreach (Creation creation in world.detectors[i].creations) {
+                        if (creation != this) {
+                            creations.Add(creation);
+                        }
+                    }
+                }
+                else if (world.detectors[i].creations.Contains(this)) {
+                    world.detectors[i].creations.Remove(this);
                 }
             }
             return creations;
+        }
+
+        public Vector2 SearchCity(World world) {
+            for (int i = position.x - searchRadius; i < position.x + searchRadius; i++) {
+                for (int j = position.y - searchRadius; j < position.y + searchRadius; j++) {
+                    if (world.map[i][j].city) {
+                        return new Vector2(i, j);
+                    }
+                }
+            }
+            return null;
+        }
+
+        public List<MapPixel> GetPixelsInRadius(World world) {
+            List<MapPixel> pixels = new List<MapPixel>();
+            for (int i = position.x - searchRadius; i < position.x + searchRadius; i++) {
+                for (int j = position.y - searchRadius; j < position.y + searchRadius; j++) {
+                    pixels.Add(world.map[i][j]);
+                }
+            }
+            return pixels;
         }
     }
 }

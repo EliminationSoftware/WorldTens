@@ -16,9 +16,19 @@ namespace WorldTens
 
             Random random = new Random();
             for (int i = 0; i < 100; i++) {
-                world.detectors[0].creations.Add(new Creation(new Vector2(100, 15), 10));
+                Creation creation = new Creation(new Vector2(235, 140), 10);
+                world.detectors[0].creations.Add(creation);
+                
+            }
+            
+            for (int i = 0; i < 50; i++) {
+                Creation creation = new Creation(new Vector2(250, 150), 10);
+                creation.politStatus = PoliticalStatus.Builder;
+                world.detectors[0].creations.Add(creation);
             }
 
+            Raylib.SetTargetFPS(60);
+            
             while (!Raylib.WindowShouldClose()) {
                 world.DecreaseTens(Raylib.GetFrameTime());
 
@@ -45,9 +55,17 @@ namespace WorldTens
                 }
 
                 for (int i = 0; i < world.detectors.Count; i++) {
-                    foreach (Creation creation in world.detectors[i].creations) {
+                    for (int j = 0; j < world.detectors[i].creations.Count; j++) {
+                        Creation creation = world.detectors[i].creations[j];
                         creation.DoAction(Raylib.GetFrameTime(), world);
-                        Raylib.DrawPixel(creation.position.x, creation.position.y, Color.RED);
+
+                        if (creation.alive) {
+                            Raylib.DrawPixel(creation.position.x, creation.position.y, Color.RED);
+                        }
+                        else {
+                            Raylib.DrawPixel(creation.position.x, creation.position.y, Color.BROWN);
+                            world.detectors[i].creations.Remove(creation);
+                        }
                     }
                 }
                 Raylib.DrawText("Good luck in WorldTens!", 10, 10, 14, Color.BLACK);
