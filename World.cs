@@ -1,6 +1,7 @@
 using System.Drawing;
 using System.Collections.Generic;
 using WorldTens.Map;
+using WorldTens.Politics;
 using System;
 using Raylib_cs;
 
@@ -15,6 +16,7 @@ namespace WorldTens
         private Bitmap bmp;
         public List<List<MapPixel>> map = new List<List<MapPixel>>();
         public List<MapDetectorSquare> detectors = new List<MapDetectorSquare>();
+        public List<Country> countries = new List<Country>();
 
         public World(string path) {
             LoadMap(path);
@@ -101,6 +103,16 @@ namespace WorldTens
                 Raylib.DrawPixel(pos.x, pos.y, Raylib_cs.Color.GRAY);
             }
             pixel = null;
+        }
+
+        public void CreateCountry(List<Creation> citizens, int detectorIndex) {
+            Country country = new Country();
+            countries.Add(country);
+            detectors[detectorIndex].country = country;
+            foreach (Creation citizen in citizens) {
+                citizen.country = country;
+            }
+            Console.WriteLine("New country created");
         }
     }
 }

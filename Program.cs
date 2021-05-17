@@ -1,9 +1,10 @@
 ﻿using System;
 using Raylib_cs;
 using System.IO;
-
+using System.Collections.Generic;
 using WorldTens.Map;
 using WorldTens;
+using WorldTens.Politics;
 
 namespace WorldTens
 {
@@ -64,8 +65,14 @@ namespace WorldTens
                 }
 
                 for (int i = 0; i < world.detectors.Count; i++) {
+                    int citizensCounter = 0;
+                    List<Creation> citizens = new List<Creation>();
                     for (int j = 0; j < world.detectors[i].creations.Count; j++) {
                         Creation creation = world.detectors[i].creations[j];
+                        if (world.map[creation.position.x][creation.position.y].city) {
+                            citizensCounter++;
+                            citizens.Add(creation);
+                        }
                         Vector2 prevPos = new Vector2(creation.position.x, creation.position.y);
                         creation.DoAction(Raylib.GetFrameTime(), world);
                         world.DrawMapPixel(prevPos);
@@ -79,6 +86,46 @@ namespace WorldTens
                             Raylib.DrawPixel(creation.position.x, creation.position.y, Color.BROWN);
                             world.detectors[i].creations.Remove(creation);
                         }
+                    }
+                    if (citizensCounter > 30) {
+                        if (world.countries.Count == 0) {
+                            world.CreateCountry(citizens, i);
+                        }
+                        int enemyCounter = 0;
+                        int citizenCounter = 0;
+                        foreach (Creation citizen in citizens) {
+                            if (citizen.country == null) {
+                                foreach (Country country in world.countries) {
+                                    if (world.detectors[i].country == country) {
+                                        citizen.country = country;
+                                    }
+                                }
+                            }
+                            else {
+                                if (world.detectors[i].country == citizen.country) {
+                                    citizenCounter++;
+                                }
+                                else {
+                                    enemyCounter++;
+                                }
+                            }
+                        }
+                        if (enemyCounter > citizenCounter) {
+                            Country dominator = null;
+                            foreach (Creation citizen in citizens) {
+                                if (citizen.country != world.detectors[i].country) {
+                                    world.detectors[i].country = citizen.country;
+                                    dominator = citizen.country;
+                                }
+                            }
+                            if (dominator == null) {
+                                world.CreateCountry(citizens, i);
+                            }
+                            Console.WriteLine("territory captured");
+                        }
+                    }
+                    else {
+                        citizens = null;
                     }
                 }
                 iterations++;

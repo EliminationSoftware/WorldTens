@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Raylib_cs;
 using WorldTens.Map;
+using WorldTens.Politics;
 
 namespace WorldTens
 {
@@ -27,6 +28,7 @@ namespace WorldTens
     }
     public class Creation
     {
+        public Country country = null;
         public Vector2 position = new Vector2(5, 5);
         public float mind = 1.0f;
         public Vehicle vehicle = new Vehicle(VehicleType.None, 100);
