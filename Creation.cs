@@ -95,7 +95,6 @@ namespace WorldTens
                     else if (politStatus == PoliticalStatus.Builder) {
                         moveOnProgress(new Vector2(random.Next(-1, 2), random.Next(-1, 2)));
                     }
-                    full -= 0.05f;
                     break;
                 case AIStatus.Follow:
                     Vector2 direction = GetDirection(creations[followIndex].position);
@@ -128,6 +127,7 @@ namespace WorldTens
 
         private void moveOnProgress(Vector2 direction) {
             moveProgress += vehicle.speed * Raylib.GetFrameTime();
+            full -= 5.0f * Raylib.GetFrameTime();
             if (moveProgress >= 100) {
                 position.x += direction.x;
                 position.y += direction.y;

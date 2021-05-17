@@ -1,5 +1,6 @@
 ﻿using System;
 using Raylib_cs;
+using System.IO;
 
 using WorldTens.Map;
 using WorldTens;
@@ -18,7 +19,12 @@ namespace WorldTens
         {
             string modelName = args.Length > 0 ? args[0] : "default";
 
-            World world = new World("resources/models/" + modelName + "/map.bmp");
+            string modelPath = "resources/models/" + modelName;
+            if (!File.Exists(modelPath + "/map.bmp") || !File.Exists(modelPath + "/spawn.yml")) {
+                Console.WriteLine("Wrong model title!");
+                return;
+            }
+            World world = new World(modelPath + "/map.bmp");
             screenWidth = world.GetMapWidth();
             screenHeight = world.GetMapHeight();
             Raylib.InitWindow(screenWidth, screenHeight, "WorldTens");
@@ -53,6 +59,7 @@ namespace WorldTens
                     Raylib.DrawText("Good luck in WorldTens!", 10, 10, 14, Color.BLACK);
                     Raylib.DrawText(iterations.ToString(), 0, screenHeight - 20, 20, Color.BLACK);
                     Raylib.DrawText(world.GetTension().ToString(), screenWidth - 100, 10, 20, Color.BLACK);
+                    Raylib.DrawText("FPS: " + Raylib.GetFPS().ToString(), 350, 0, 20, Color.BLACK);
                     iterTmp = 0;
                 }
 
@@ -76,10 +83,6 @@ namespace WorldTens
                 }
                 iterations++;
                 iterTmp++;
-                if(Raylib.IsKeyDown(KeyboardKey.KEY_F))
-                {
-                    Raylib.DrawText("FPS: " + Raylib.GetFPS().ToString(), 350, 0, 20, Color.BLACK);
-                }
                 Raylib.EndDrawing();
             }
 
