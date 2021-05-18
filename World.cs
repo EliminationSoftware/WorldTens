@@ -13,6 +13,7 @@ namespace WorldTens
         private float tensionFallTime = 1.0f;
         private float tensionFallAmount = 0.01f;
         private float speed = 1f;
+        private float timePased = 0;
         private Bitmap bmp;
         public List<List<MapPixel>> map = new List<List<MapPixel>>();
         public List<MapDetectorSquare> detectors = new List<MapDetectorSquare>();
@@ -113,6 +114,14 @@ namespace WorldTens
                 citizen.country = country;
             }
             Console.WriteLine("New country created");
+        }
+
+        public void AddTime() {
+            timePased += Raylib.GetFrameTime();
+        }
+
+        public float GetTime() {
+            return timePased;
         }
     }
 }

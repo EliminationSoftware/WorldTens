@@ -127,9 +127,18 @@ namespace WorldTens
                     else {
                         citizens = null;
                     }
+                    if (world.GetTime() % 10 < 0.3) {
+                        foreach (Country country in world.countries) {
+                            if (world.detectors[i].country == country) {
+                                country.CalculateRequirements(world);
+                                country.ExecuteRequirements(citizens);
+                            }
+                        }
+                    }
                 }
                 iterations++;
                 iterTmp++;
+                world.AddTime();
                 Raylib.EndDrawing();
             }
 

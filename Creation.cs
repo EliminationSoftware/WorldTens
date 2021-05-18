@@ -41,6 +41,7 @@ namespace WorldTens
         private float full = 100;
         private float eatSpeed = 30;
         private int searchRadius = 20;
+        private float hungerSpeed = 5.0f;
 
         public Creation() {
 
@@ -69,12 +70,7 @@ namespace WorldTens
                 status = AIStatus.Build;
             }
             else {
-                if (creations.Count > 0 && politStatus == PoliticalStatus.Soldier) {
-                    status = AIStatus.Follow;
-                }
-                else {
-                    status = AIStatus.Move;
-                }
+                status = AIStatus.Move;
             }
 
             if (full <= 20 && world.map[position.x][position.y].city) {
@@ -82,6 +78,9 @@ namespace WorldTens
             }
 
             if (full <= 0) {
+                if (politStatus == PoliticalStatus.Soldier) {
+                    Console.WriteLine("Soldier dies from starvation");
+                }
                 alive = false;
                 return;
             }
@@ -96,6 +95,23 @@ namespace WorldTens
                     }
                     else if (politStatus == PoliticalStatus.Builder) {
                         moveOnProgress(new Vector2(random.Next(-1, 2), random.Next(-1, 2)));
+                    }
+                    else if (politStatus == PoliticalStatus.Soldier) {
+                        full = 100;
+                        Vector2 dir = SearchEnemy(world);
+                        if (dir != null) {
+                            moveOnProgress(GetDirection(dir));
+                        }
+
+                        foreach (Creation creation in creations) {
+                            if (creation.country != country) {
+                                progress += (float)random.NextDouble() * mind;
+                                if (progress > 100) {
+                                    creation.alive = false;
+                                    progress = 0;
+                                }
+                            }
+                        }
                     }
                     break;
                 case AIStatus.Follow:
@@ -127,9 +143,16 @@ namespace WorldTens
             }
         }
 
+        public void MakeSolider() {
+            politStatus = PoliticalStatus.Soldier;
+            searchRadius = 30;
+            hungerSpeed = 0;
+            full = 100;
+        }
+
         private void moveOnProgress(Vector2 direction) {
             moveProgress += vehicle.speed * Raylib.GetFrameTime();
-            full -= 5.0f * Raylib.GetFrameTime();
+            full -= hungerSpeed * Raylib.GetFrameTime();
             if (moveProgress >= 100) {
                 position.x += direction.x;
                 position.y += direction.y;
@@ -200,6 +223,17 @@ namespace WorldTens
                 for (int j = position.y - searchRadius; j < position.y + searchRadius; j++) {
                     if (world.map[i][j].city) {
                         return new Vector2(i, j);
+                    }
+                }
+            }
+            return null;
+        }
+
+        public Vector2 SearchEnemy(World world) {
+            foreach (MapDetectorSquare detector in world.detectors) {
+                foreach (Creation creation in detector.creations) { 
+                    if (creation.country != country) {
+                        return creation.position;
                     }
                 }
             }
