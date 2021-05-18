@@ -9,3 +9,15 @@
   mind: 10
   politStatus: "builder"
   count: 250
+
+- posX: 600
+  posY: 150
+  mind: 10
+  politStatus: "builder"
+  count: 50
+
+- posX: 585
+  posY: 150
+  mind: 10
+  politStatus: "civilian"
+  count: 250

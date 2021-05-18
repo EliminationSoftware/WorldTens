@@ -109,6 +109,7 @@ namespace WorldTens
                                 if (progress > 100) {
                                     creation.alive = false;
                                     progress = 0;
+                                    world.IncreaseTens(0.001f);
                                 }
                             }
                         }

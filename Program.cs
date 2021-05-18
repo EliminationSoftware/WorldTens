@@ -15,6 +15,8 @@ namespace WorldTens
         public static uint iterations = 0;
         public static uint iterTmp = 0;
         public static uint iterMax = 200;
+        public static System.Numerics.Vector2 mouseSelPos;
+        public static System.Numerics.Vector2 mouseReleasePos;
 
         static void Main(string[] args)
         {
@@ -69,10 +71,10 @@ namespace WorldTens
                     List<Creation> citizens = new List<Creation>();
                     for (int j = 0; j < world.detectors[i].creations.Count; j++) {
                         Creation creation = world.detectors[i].creations[j];
-                        if (world.map[creation.position.x][creation.position.y].city) {
+                        //if (world.map[creation.position.x][creation.position.y].city) {
                             citizensCounter++;
                             citizens.Add(creation);
-                        }
+                        //}
                         Vector2 prevPos = new Vector2(creation.position.x, creation.position.y);
                         creation.DoAction(Raylib.GetFrameTime(), world);
                         world.DrawMapPixel(prevPos);
@@ -95,6 +97,9 @@ namespace WorldTens
                         int citizenCounter = 0;
                         foreach (Creation citizen in citizens) {
                             if (citizen.country == null) {
+                                world.CreateCountry(citizens, i);
+                            }
+                            if (citizen.country != world.detectors[i].country) {
                                 foreach (Country country in world.countries) {
                                     if (world.detectors[i].country == country) {
                                         citizen.country = country;
@@ -124,10 +129,7 @@ namespace WorldTens
                             Console.WriteLine("territory captured");
                         }
                     }
-                    else {
-                        citizens = null;
-                    }
-                    if (world.GetTime() % 10 < 0.3) {
+                    if (world.GetTime() % world.yearTime < 0.3) {
                         foreach (Country country in world.countries) {
                             if (world.detectors[i].country == country) {
                                 country.CalculateRequirements(world);
@@ -135,10 +137,51 @@ namespace WorldTens
                             }
                         }
                     }
+                    citizens = null;
                 }
                 iterations++;
                 iterTmp++;
                 world.AddTime();
+
+                if (Raylib.IsKeyDown(KeyboardKey.KEY_J)) {
+                    Console.WriteLine(world.GetTension());
+                }
+
+                if (Raylib.IsKeyDown(KeyboardKey.KEY_K)) {
+                    foreach (MapDetectorSquare detector in world.detectors) {
+                        if (detector.country != null) {
+                            Random random = new Random(detector.country.ident);
+                            int red = random.Next(255);
+                            int blue = new Random(detector.country.blue).Next(255);
+                            int green = new Random(detector.country.green).Next(255);
+                            Raylib.DrawRectangle(detector.position.x, detector.position.y, detector.wh.x, detector.wh.y, new Color(red, blue, green, 100));
+                        }
+                    }
+                }
+
+                if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_LEFT_BUTTON)) {
+                    mouseSelPos = Raylib.GetMousePosition();
+                }
+
+                if (Raylib.IsMouseButtonReleased(MouseButton.MOUSE_LEFT_BUTTON)) {
+                    mouseReleasePos = Raylib.GetMousePosition();
+
+                    Rectangle rect = new Rectangle(mouseSelPos.X, mouseReleasePos.Y, Math.Abs(mouseReleasePos.X - mouseSelPos.X), Math.Abs(mouseReleasePos.Y - mouseSelPos.Y));
+                    foreach (MapDetectorSquare detector in world.detectors) {
+                        foreach (Creation creation in detector.creations) {
+                            if (Raylib.CheckCollisionPointRec(new System.Numerics.Vector2(creation.position.x, creation.position.y), rect)) {
+                                if (creation.country != null) {
+                                    Console.WriteLine("Country: " + creation.country.GetHashCode());
+                                }
+                                else {
+                                    Console.WriteLine("Country: null");
+                                }
+                                Console.WriteLine("PolitStatus: " + creation.politStatus);
+                            }
+                        }
+                    }
+                }
+
                 Raylib.EndDrawing();
             }
 

@@ -14,6 +14,7 @@ namespace WorldTens
         private float tensionFallAmount = 0.01f;
         private float speed = 1f;
         private float timePased = 0;
+        public float yearTime = 10.0f;
         private Bitmap bmp;
         public List<List<MapPixel>> map = new List<List<MapPixel>>();
         public List<MapDetectorSquare> detectors = new List<MapDetectorSquare>();
