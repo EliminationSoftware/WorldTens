@@ -24,8 +24,9 @@ namespace WorldTens
             LoadMap(path);
         }
 
-        public void IncreaseTens(float amount) {
+        public void IncreaseTens(float amount, Country country) {
             tension += amount;
+            country.createdTension += amount;
             if (tension > 120) {
                 tension = 120;
             }

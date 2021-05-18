@@ -105,11 +105,22 @@ namespace WorldTens
 
                         foreach (Creation creation in creations) {
                             if (creation.country != country) {
+                                if (!country.warLevel.TryGetValue(creation.country, out byte level)) {
+                                    continue;
+                                }
                                 progress += (float)random.NextDouble() * mind;
                                 if (progress > 100) {
                                     creation.alive = false;
                                     progress = 0;
-                                    world.IncreaseTens(0.001f);
+                                    world.IncreaseTens(0.001f, country);
+                                    if (!country.warLevel.ContainsKey(creation.country)) {
+                                        country.warLevel.Add(creation.country, 1);
+                                    }
+                                    else {
+                                        if (country.warLevel[creation.country] < byte.MaxValue) {
+                                            country.warLevel[creation.country]++;
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -130,7 +141,7 @@ namespace WorldTens
                             world.map[position.x][position.y].road = true;
                         }
                         progress = 0;
-                        world.IncreaseTens(0.01f);
+                        world.IncreaseTens(0.01f, country);
                     }
                     break;
                 case AIStatus.Eat:
@@ -234,7 +245,11 @@ namespace WorldTens
             foreach (MapDetectorSquare detector in world.detectors) {
                 foreach (Creation creation in detector.creations) { 
                     if (creation.country != country) {
-                        return creation.position;
+                        if (country.warLevel.TryGetValue(creation.country, out byte level)) {
+                            if (level > 0) {
+                                return creation.position;
+                            }
+                        }
                     }
                 }
             }

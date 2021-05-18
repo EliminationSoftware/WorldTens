@@ -89,14 +89,14 @@ namespace WorldTens
                             world.detectors[i].creations.Remove(creation);
                         }
                     }
-                    if (citizensCounter > 30) {
+                    if (citizensCounter > 2) {
                         if (world.countries.Count == 0) {
                             world.CreateCountry(citizens, i);
                         }
                         int enemyCounter = 0;
                         int citizenCounter = 0;
                         foreach (Creation citizen in citizens) {
-                            if (citizen.country == null) {
+                            if (citizen.country == null && world.detectors[i].country == null) {
                                 world.CreateCountry(citizens, i);
                             }
                             if (citizen.country != world.detectors[i].country) {
@@ -132,6 +132,7 @@ namespace WorldTens
                     if (world.GetTime() % world.yearTime < 0.3) {
                         foreach (Country country in world.countries) {
                             if (world.detectors[i].country == country) {
+                                country.CalculateWars(world);
                                 country.CalculateRequirements(world);
                                 country.ExecuteRequirements(citizens);
                             }
@@ -171,7 +172,7 @@ namespace WorldTens
                         foreach (Creation creation in detector.creations) {
                             if (Raylib.CheckCollisionPointRec(new System.Numerics.Vector2(creation.position.x, creation.position.y), rect)) {
                                 if (creation.country != null) {
-                                    Console.WriteLine("Country: " + creation.country.GetHashCode());
+                                    Console.WriteLine("Country: " + creation.country.ident);
                                 }
                                 else {
                                     Console.WriteLine("Country: null");
