@@ -17,6 +17,7 @@ namespace WorldTens
         Panic,
         Research,
         Follow,
+        Reproduce,
     }
 
     public enum PoliticalStatus {
@@ -44,6 +45,7 @@ namespace WorldTens
         private int searchRadius = 20;
         private float hungerSpeed = 5.0f;
         private Vector2 destination = null;
+        private MapDetectorSquare detectorLocation = null;
 
         public Creation() {
 
@@ -58,20 +60,29 @@ namespace WorldTens
             if (!alive) {
                 return;
             }
+
+            CheckDetector(world);
             // Checks here
             if (world.map[position.x][position.y].water) {
                 status = AIStatus.Move;
             }
 
-            List<Creation> creations = searchCreations(world);
-            if (creations.Count > 0) {
+            //List<Creation> creations = searchCreations(world);
+            /*if (detectorLocation.creations.Count > 0) {
                 status = AIStatus.Follow;
+            }*/
+
+            if (politStatus == PoliticalStatus.Civilian && detectorLocation.creations.Count > 1) {
+                status = AIStatus.Reproduce;
             }
 
             if (world.map[position.x][position.y].grass && !world.map[position.x][position.y].city && politStatus == PoliticalStatus.Builder) {
                 status = AIStatus.Build;
             }
-            else {
+            else if (politStatus == PoliticalStatus.Civilian && !world.map[position.x][position.y].city){
+                status = AIStatus.Move;
+            }
+            else if (politStatus == PoliticalStatus.Builder || politStatus == PoliticalStatus.Soldier) {
                 status = AIStatus.Move;
             }
 
@@ -88,7 +99,7 @@ namespace WorldTens
             }
             
             Random random = new Random();
-            int followIndex = random.Next(creations.Count);
+            //int followIndex = random.Next(creations.Count);
             //Actions here
             switch (status) {
                 case AIStatus.Move:
@@ -115,7 +126,7 @@ namespace WorldTens
                             moveOnProgress(GetDirection(destination));
                         }
 
-                        foreach (Creation creation in creations) {
+                        foreach (Creation creation in detectorLocation.creations) {
                             if (creation.country != country && creation.country != null && country != null){
                                 if (!country.warLevel.TryGetValue(creation.country, out byte level)) {
                                     continue;
@@ -138,11 +149,11 @@ namespace WorldTens
                         }
                     }
                     break;
-                case AIStatus.Follow:
+                /*case AIStatus.Follow:
                     Vector2 direction = GetDirection(creations[followIndex].position);
                     position.x += direction.x;
                     position.y += direction.y;
-                    break;
+                    break;*/
                 case AIStatus.Build:
                     progress += speedBuid * delta;
                     if (progress >= 100) {
@@ -162,6 +173,16 @@ namespace WorldTens
                     }
                     else {
                         MoveToCity(world);
+                    }
+                    break;
+                case AIStatus.Reproduce:
+                    progress += 1.0f * delta;
+                    if (progress >= 100 && detectorLocation != null) {
+                        Creation child = new Creation(position, mind + 2);
+                        child.country = country;
+                        detectorLocation.creations.Add(child);
+                        Console.WriteLine("Detector population is now {0}", detectorLocation.creations.Count);
+                        progress -= 100;
                     }
                     break;
             }
@@ -232,6 +253,7 @@ namespace WorldTens
             for (int i = 0; i < world.detectors.Count; i++) {
                 Rectangle detector = new Rectangle(world.detectors[i].position.x, world.detectors[i].position.y, world.detectors[i].wh.x, world.detectors[i].wh.y);
                 if (Raylib.CheckCollisionPointRec(new System.Numerics.Vector2(position.x, position.y), detector)) {
+                    detectorLocation = world.detectors[i];
                     if (!world.detectors[i].creations.Contains(this)) {
                         world.detectors[i].creations.Add(this);
                     }
@@ -246,6 +268,27 @@ namespace WorldTens
                 }
             }
             return creations;
+        }
+
+        private void CheckDetector(World world) {
+            if (detectorLocation != null) {
+                Rectangle detector = new Rectangle(detectorLocation.position.x, detectorLocation.position.y, detectorLocation.wh.x, detectorLocation.wh.y);
+                if (Raylib.CheckCollisionPointRec(new System.Numerics.Vector2(position.x, position.y), detector)) {
+                    return; 
+                }
+            }
+            for (int i = 0; i < world.detectors.Count; i++) {
+                Rectangle detector2 = new Rectangle(world.detectors[i].position.x, world.detectors[i].position.y, world.detectors[i].wh.x, world.detectors[i].wh.y);
+                if (Raylib.CheckCollisionPointRec(new System.Numerics.Vector2(position.x, position.y), detector2)) {
+                    if (!world.detectors[i].creations.Contains(this)) {
+                        world.detectors[i].creations.Add(this);
+                    }
+                    detectorLocation = world.detectors[i];
+                }
+                else if (world.detectors[i].creations.Contains(this)) {
+                    world.detectors[i].creations.Remove(this);
+                }
+            }
         }
 
         public Vector2 SearchCity(World world) {
