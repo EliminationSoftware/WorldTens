@@ -225,20 +225,13 @@ namespace WorldTens
         }
 
         private Vector2 GetDirection(Vector2 targetPos) {
-            Vector2 dir = new Vector2(0, 0);
-            if (position.x < targetPos.x) {
-                dir.x += 1;
-            }
-            else {
-                dir.x -= 1;
-            }
-            if (position.y < targetPos.y) {
-                dir.y += 1;
-            }
-            else {
-                dir.y -= 1;
-            }
-            return dir;
+            Random random = new Random();
+            float tan = ((position.x - targetPos.x) / (position.y - targetPos.y));
+
+            if (random.NextDouble() < tan)
+                return position.x < targetPos.x ? new Vector2(1, 0) : new Vector2(-1, 0);
+            else
+                return position.y < targetPos.y ? new Vector2(0, 1) : new Vector2(0, -1);
         }
 
         public List<Creation> searchCreations(World world) {
