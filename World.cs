@@ -11,16 +11,23 @@ namespace WorldTens
     {
         private float tension = 0.0f;
         private float tensionFallTime = 1.0f;
-        private float tensionFallAmount = 0.01f;
+        private float tensionFallAmount = 0.05f;
         private float speed = 1f;
         private float timePased = 0;
-        public float yearTime = 10.0f;
+        public float yearTime = 30.0f;
         public int year = 0;
         private Bitmap bmp;
         private float timeTmp = 0;
         public List<List<MapPixel>> map = new List<List<MapPixel>>();
         public List<MapDetectorSquare> detectors = new List<MapDetectorSquare>();
         public List<Country> countries = new List<Country>();
+
+        private Dictionary<PixelStatus, Raylib_cs.Color> pxStatusColors = new Dictionary<PixelStatus, Raylib_cs.Color> {
+            { PixelStatus.Grass, Raylib_cs.Color.GREEN },
+            { PixelStatus.Water, Raylib_cs.Color.BLUE  },
+            { PixelStatus.City,  Raylib_cs.Color.BLACK },
+            { PixelStatus.Road,  Raylib_cs.Color.GRAY  }
+        };
 
         public World(string path) {
             LoadMap(path);
@@ -71,8 +78,7 @@ namespace WorldTens
             MapColor water = new MapColor(255, 255, 255);
 
             MapPixel waterPixel = new MapPixel();
-            waterPixel.water = true;
-            waterPixel.grass = false;
+            waterPixel.status = PixelStatus.Water;
             for (int i = 0; i < bmp.Width; i++) {
                 map.Add(new List<MapPixel>());
                 for (int j = 0; j < bmp.Height; j++) {
@@ -97,18 +103,7 @@ namespace WorldTens
 
         public void DrawMapPixel(Vector2 pos) {
             MapPixel pixel = map[pos.x][pos.y];
-            if (pixel.grass) {
-                Raylib.DrawPixel(pos.x, pos.y, Raylib_cs.Color.GREEN);
-            }
-            else if (pixel.water) {
-                Raylib.DrawPixel(pos.x, pos.y, Raylib_cs.Color.BLUE);
-            }
-            if (pixel.city) {
-                Raylib.DrawPixel(pos.x, pos.y, Raylib_cs.Color.BLACK);
-            }
-            else if (pixel.road) {
-                Raylib.DrawPixel(pos.x, pos.y, Raylib_cs.Color.GRAY);
-            }
+            Raylib.DrawPixel(pos.x, pos.y, pxStatusColors[pixel.status]);
             pixel = null;
         }
 
@@ -133,6 +128,24 @@ namespace WorldTens
 
         public float GetTime() {
             return timePased;
+        }
+
+        public void DrawOptimized() {
+            int lineBeginY;
+            PixelStatus lineBeginStatus;
+
+            for (int x = 0; x < bmp.Width; x++) {
+                lineBeginY = 0;
+                lineBeginStatus = map[x][0].status;
+
+                for (int y = 0; y < bmp.Height; y++) {
+                    if (map[x][y].status != lineBeginStatus || y + 1 >= bmp.Height) {
+                        Raylib.DrawLine(x, lineBeginY, x, y + 1, pxStatusColors[lineBeginStatus]);
+                        lineBeginY = y;
+                        lineBeginStatus = map[x][y].status;
+                    }
+                }
+            }
         }
     }
 }
