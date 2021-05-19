@@ -31,6 +31,7 @@ namespace WorldTens
         public Country country = null;
         public Vector2 position = new Vector2(5, 5);
         public float mind = 1.0f;
+        public float capturingProgress = 0;
         public Vehicle vehicle = new Vehicle(VehicleType.None, 100);
         private AIStatus status = AIStatus.Move;
         public PoliticalStatus politStatus = PoliticalStatus.Civilian;
@@ -42,6 +43,7 @@ namespace WorldTens
         private float eatSpeed = 30;
         private int searchRadius = 20;
         private float hungerSpeed = 5.0f;
+        private Vector2 destination = null;
 
         public Creation() {
 
@@ -94,17 +96,27 @@ namespace WorldTens
                         MoveToCity(world);
                     }
                     else if (politStatus == PoliticalStatus.Builder) {
-                        moveOnProgress(new Vector2(random.Next(-1, 2), random.Next(-1, 2)));
+                        /*if (destination == null) {
+                            destination = SearchGrass(world);
+                        }
+                        if (destination != null) {
+                            moveOnProgress(GetDirection(destination));
+                        }*/
+                        //else {
+                            moveOnProgress(new Vector2(random.Next(-1, 2), random.Next(-1, 2)));
+                        //}
                     }
                     else if (politStatus == PoliticalStatus.Soldier) {
                         full = 100;
-                        Vector2 dir = SearchEnemy(world);
-                        if (dir != null) {
-                            moveOnProgress(GetDirection(dir));
+                        if (destination == null) {
+                            destination = SearchEnemy(world);   
+                        }
+                        if (destination != null) {
+                            moveOnProgress(GetDirection(destination));
                         }
 
                         foreach (Creation creation in creations) {
-                            if (creation.country != country) {
+                            if (creation.country != country && creation.country != null && country != null){
                                 if (!country.warLevel.TryGetValue(creation.country, out byte level)) {
                                     continue;
                                 }
@@ -160,6 +172,7 @@ namespace WorldTens
             searchRadius = 30;
             hungerSpeed = 0;
             full = 100;
+            destination = null;
         }
 
         private void moveOnProgress(Vector2 direction) {
@@ -170,14 +183,19 @@ namespace WorldTens
                 position.y += direction.y;
                 moveProgress -= 100;
             }
+            if (position == destination) {
+                destination = null;
+            }
         }
 
         private void MoveToCity(World world) {
             Random random = new Random();
-            Vector2 cityPos = SearchCity(world);
+            if (destination == null) {
+                destination = SearchCity(world);
+            }
             Vector2 directionCity;
-            if (cityPos != null) {
-                directionCity = GetDirection(cityPos);
+            if (destination != null) {
+                directionCity = GetDirection(destination);
             }
             else {
                 directionCity = new Vector2(random.Next(-1, 2), random.Next(-1, 2));
@@ -241,10 +259,33 @@ namespace WorldTens
             return null;
         }
 
+        private Vector2 SearchGrass(World world) { // Fix this
+            Random random = new Random();
+            if (random.Next(2) == 1) {
+                for (int i = position.x - searchRadius + random.Next(searchRadius); i < position.x + searchRadius; i++) {
+                    for (int j = position.y - searchRadius + random.Next(searchRadius); j < position.y + searchRadius; j++) {
+                        if (world.map[i][j].grass && new Random().Next(40) == 1) {
+                            return new Vector2(i, j);
+                        }
+                    }
+                }
+            }
+            else {
+                for (int i = position.x + searchRadius * 2; i > position.x; i--) {
+                    for (int j = position.y - searchRadius + random.Next(searchRadius); j < position.y + searchRadius; j++) {
+                        if (world.map[i][j].grass && new Random().Next(40) == 1) {
+                            return new Vector2(i, j);
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
         public Vector2 SearchEnemy(World world) {
             foreach (MapDetectorSquare detector in world.detectors) {
                 foreach (Creation creation in detector.creations) { 
-                    if (creation.country != country) {
+                    if (creation.country != country && creation.country != null && country != null) {
                         if (country.warLevel.TryGetValue(creation.country, out byte level)) {
                             if (level > 0) {
                                 return creation.position;
@@ -264,6 +305,10 @@ namespace WorldTens
                 }
             }
             return pixels;
+        }
+
+        public Vector2 GetDesination() {
+            return destination;
         }
     }
 }

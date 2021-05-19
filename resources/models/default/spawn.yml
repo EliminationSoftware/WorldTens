@@ -2,13 +2,13 @@
   posY: 140
   mind: 35
   politStatus: "civilian"
-  count: 1300
+  count: 200
 
 - posX: 256
   posY: 150
   mind: 10
   politStatus: "civilian"
-  count: 780
+  count: 130
 
 - posX: 320
   posY: 140

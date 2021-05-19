@@ -42,7 +42,7 @@ namespace WorldTens.Politics
 
         public void CalculateWars(World world) {
             foreach (Country country in world.countries) {
-                if (country != this && world.GetTension() / country.createdTension < 2.5 && world.GetTension() > 15 && !warLevel.ContainsKey(country)) {
+                if (((country != this && world.GetTension() / country.createdTension < 2.5 && world.GetTension() > 15) || (world.GetTension() > 80 && world.GetTension() / country.createdTension < 4)) && !warLevel.ContainsKey(country)) {
                     warLevel.Add(country, 1);
                     if (!country.warLevel.ContainsKey(this)) {
                         country.warLevel.Add(this, 10);

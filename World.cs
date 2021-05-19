@@ -26,7 +26,9 @@ namespace WorldTens
 
         public void IncreaseTens(float amount, Country country) {
             tension += amount;
-            country.createdTension += amount;
+            if (country != null) {
+                country.createdTension += amount;
+            }
             if (tension > 120) {
                 tension = 120;
             }

@@ -99,20 +99,11 @@ namespace WorldTens
                             if (citizen.country == null && world.detectors[i].country == null) {
                                 world.CreateCountry(citizens, i);
                             }
-                            if (citizen.country != world.detectors[i].country) {
-                                foreach (Country country in world.countries) {
-                                    if (world.detectors[i].country == country) {
-                                        citizen.country = country;
-                                    }
-                                }
+                            if (world.detectors[i].country == citizen.country) {
+                                citizenCounter++;
                             }
                             else {
-                                if (world.detectors[i].country == citizen.country) {
-                                    citizenCounter++;
-                                }
-                                else {
-                                    enemyCounter++;
-                                }
+                                enemyCounter++;
                             }
                         }
                         if (enemyCounter > citizenCounter) {
@@ -121,6 +112,12 @@ namespace WorldTens
                                 if (citizen.country != world.detectors[i].country) {
                                     world.detectors[i].country = citizen.country;
                                     dominator = citizen.country;
+                                    break;
+                                }
+                            }
+                            foreach (Creation citizen in citizens) {
+                                if (citizen.country != world.detectors[i].country) {
+                                    citizen.country = world.detectors[i].country;
                                 }
                             }
                             if (dominator == null) {
@@ -143,6 +140,10 @@ namespace WorldTens
                 iterations++;
                 iterTmp++;
                 world.AddTime();
+
+                if (Raylib.IsKeyDown(KeyboardKey.KEY_KP_MULTIPLY)) {
+                    world.IncreaseTens(100, world.countries[0]);
+                }
 
                 if (Raylib.IsKeyDown(KeyboardKey.KEY_J)) {
                     Console.WriteLine(world.GetTension());
@@ -178,6 +179,13 @@ namespace WorldTens
                                     Console.WriteLine("Country: null");
                                 }
                                 Console.WriteLine("PolitStatus: " + creation.politStatus);
+                                Vector2 dest = creation.GetDesination();
+                                if (dest != null) { 
+                                    Console.WriteLine("Destination: {0}, {1}", dest.x, dest.y);
+                                }
+                                else {
+                                    Console.WriteLine("Destination: None");
+                                }
                             }
                         }
                     }
