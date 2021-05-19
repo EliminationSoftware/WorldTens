@@ -15,7 +15,9 @@ namespace WorldTens
         private float speed = 1f;
         private float timePased = 0;
         public float yearTime = 10.0f;
+        public int year = 0;
         private Bitmap bmp;
+        private float timeTmp = 0;
         public List<List<MapPixel>> map = new List<List<MapPixel>>();
         public List<MapDetectorSquare> detectors = new List<MapDetectorSquare>();
         public List<Country> countries = new List<Country>();
@@ -122,6 +124,11 @@ namespace WorldTens
 
         public void AddTime() {
             timePased += Raylib.GetFrameTime();
+            timeTmp += Raylib.GetFrameTime();
+            if (timeTmp > yearTime) {
+                year++;
+                timeTmp = 0;
+            }
         }
 
         public float GetTime() {

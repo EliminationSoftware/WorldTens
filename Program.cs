@@ -17,6 +17,7 @@ namespace WorldTens
         public static uint iterMax = 200;
         public static System.Numerics.Vector2 mouseSelPos;
         public static System.Numerics.Vector2 mouseReleasePos;
+        private static int yearCalc = 0;
 
         static void Main(string[] args)
         {
@@ -126,7 +127,7 @@ namespace WorldTens
                             Console.WriteLine("territory captured");
                         }
                     }
-                    if (world.GetTime() % world.yearTime < 0.3) {
+                    if (world.year != yearCalc) {
                         foreach (Country country in world.countries) {
                             if (world.detectors[i].country == country) {
                                 country.CalculateWars(world);
@@ -136,6 +137,10 @@ namespace WorldTens
                         }
                     }
                     citizens = null;
+                }
+
+                if (world.year != yearCalc) {
+                    yearCalc = world.year;
                 }
                 iterations++;
                 iterTmp++;
