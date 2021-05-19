@@ -1,23 +1,72 @@
-- posX: 265
-  posY: 140
+- posX: 434
+  posY: 227
   mind: 10
   politStatus: "civilian"
   count: 200
 
-- posX: 250
-  posY: 150
+- posX: 434
+  posY: 227
   mind: 10
   politStatus: "builder"
-  count: 250
+  count: 80
 
-- posX: 600
-  posY: 150
-  mind: 10
-  politStatus: "builder"
-  count: 50
-
-- posX: 585
-  posY: 150
+- posX: 448
+  posY: 175
   mind: 10
   politStatus: "civilian"
-  count: 250
+  count: 260
+
+- posX: 448
+  posY: 175
+  mind: 10
+  politStatus: "builder"
+  count: 20
+
+- posX: 233
+  posY: 209
+  mind: 10
+  politStatus: "civilian"
+  count: 120
+
+- posX: 233
+  posY: 209
+  mind: 10
+  politStatus: "builder"
+  count: 230
+
+- posX: 702
+  posY: 154
+  mind: 10
+  politStatus: "civilian"
+  count: 200
+
+- posX: 702
+  posY: 154
+  mind: 10
+  politStatus: "builder"
+  count: 80
+
+- posX: 702
+  posY: 154
+  mind: 10
+  politStatus: "civilian"
+  count: 200
+
+- posX: 702
+  posY: 154
+  mind: 10
+  politStatus: "builder"
+  count: 80
+
+
+- posX: 621
+  posY: 212
+  mind: 10
+  politStatus: "civilian"
+  count: 200
+
+- posX: 621
+  posY: 212
+  mind: 10
+  politStatus: "builder"
+  count: 80
