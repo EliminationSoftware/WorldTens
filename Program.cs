@@ -44,7 +44,7 @@ namespace WorldTens
                     ), creationSets[i].mind);
 
                     creation.politStatus = creationSets[i].politStatus;
-                    world.detectors[0].creations.Add(creation);
+                    creation.GetDetectorFirstTime(world).creations.Add(creation);
                 }
             }
 
@@ -53,7 +53,7 @@ namespace WorldTens
 
                 Raylib.BeginDrawing();
 
-                if (args.Length > 1 && (OperatingSystem.IsWindows() || args[1] == "opt" && args[1] != "normal")) {
+                if (OperatingSystem.IsWindows() || args.Length < 2 || (args.Length > 1 && args[1] != "time")) {
                     Raylib.ClearBackground(Color.WHITE);
                     world.DrawOptimized();
                     Raylib.DrawText("Good luck in WorldTens!", 10, 10, 14, Color.BLACK);

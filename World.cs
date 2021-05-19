@@ -11,10 +11,10 @@ namespace WorldTens
     {
         private float tension = 0.0f;
         private float tensionFallTime = 1.0f;
-        private float tensionFallAmount = 0.01f;
+        private float tensionFallAmount = 0.05f;
         private float speed = 1f;
         private float timePased = 0;
-        public float yearTime = 10.0f;
+        public float yearTime = 30.0f;
         public int year = 0;
         private Bitmap bmp;
         private float timeTmp = 0;
