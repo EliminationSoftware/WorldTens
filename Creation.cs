@@ -76,7 +76,7 @@ namespace WorldTens
                 status = AIStatus.Reproduce;
             }
 
-            if (world.map[position.x][position.y].status == PixelStatus.Grass && world.map[position.x][position.y].status != PixelStatus.City && politStatus == PoliticalStatus.Builder) {
+            if ((world.map[position.x][position.y].status == PixelStatus.Grass || world.map[position.x][position.y].status == PixelStatus.Road) && politStatus == PoliticalStatus.Builder) {
                 status = AIStatus.Build;
             }
             else if (politStatus == PoliticalStatus.Civilian && world.map[position.x][position.y].status != PixelStatus.City){
@@ -86,7 +86,7 @@ namespace WorldTens
                 status = AIStatus.Move;
             }
 
-            if (full <= 20 && world.map[position.x][position.y].status == PixelStatus.City) {
+            if (full <= 35 && world.map[position.x][position.y].status == PixelStatus.City) {
                 status = AIStatus.Eat;
             }
 
@@ -183,6 +183,7 @@ namespace WorldTens
                         detectorLocation.creations.Add(child);
                         Console.WriteLine("Detector population is now {0}", detectorLocation.creations.Count);
                         progress -= 100;
+                        world.IncreaseTens(0.005f, country);
                     }
                     break;
             }
@@ -352,6 +353,11 @@ namespace WorldTens
 
         public Vector2 GetDesination() {
             return destination;
+        }
+
+        public MapDetectorSquare GetDetectorFirstTime(World world) {
+            CheckDetector(world);
+            return detectorLocation;
         }
     }
 }
