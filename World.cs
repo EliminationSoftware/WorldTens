@@ -22,6 +22,13 @@ namespace WorldTens
         public List<MapDetectorSquare> detectors = new List<MapDetectorSquare>();
         public List<Country> countries = new List<Country>();
 
+        private Dictionary<PixelStatus, Raylib_cs.Color> pxStatusColors = new Dictionary<PixelStatus, Raylib_cs.Color> {
+            { PixelStatus.Grass, Raylib_cs.Color.GREEN },
+            { PixelStatus.Water, Raylib_cs.Color.BLUE  },
+            { PixelStatus.City,  Raylib_cs.Color.BLACK },
+            { PixelStatus.Road,  Raylib_cs.Color.GRAY  }
+        };
+
         public World(string path) {
             LoadMap(path);
         }
@@ -96,20 +103,7 @@ namespace WorldTens
 
         public void DrawMapPixel(Vector2 pos) {
             MapPixel pixel = map[pos.x][pos.y];
-            switch (pixel.status) {
-                case PixelStatus.Grass:
-                    Raylib.DrawPixel(pos.x, pos.y, Raylib_cs.Color.GREEN);
-                    break;
-                case PixelStatus.Water:
-                    Raylib.DrawPixel(pos.x, pos.y, Raylib_cs.Color.BLUE);
-                    break;
-                case PixelStatus.City:
-                    Raylib.DrawPixel(pos.x, pos.y, Raylib_cs.Color.BLACK);
-                    break;
-                case PixelStatus.Road:
-                    Raylib.DrawPixel(pos.x, pos.y, Raylib_cs.Color.GRAY);
-                    break;
-            }
+            Raylib.DrawPixel(pos.x, pos.y, pxStatusColors[pixel.status]);
             pixel = null;
         }
 
@@ -137,39 +131,20 @@ namespace WorldTens
         }
 
         public void DrawOptimized() {
-            MapPixel prevPixel = map[0][0];
-            int x = 0;
-            int y = 0;
-            int whx = 1;
-            int why = 1;
-            int jumpX = 3;
-            int jumpY = 3;
-            for (int i = 0; i < GetMapWidth(); i += jumpX) {
-                for (int j = 0; j < GetMapHeight(); j += jumpY) {
-                    if (prevPixel != map[i][j]) {
-                        switch (prevPixel.status) {
-                            case PixelStatus.Grass:
-                                Raylib.DrawRectangle(x, y, whx, why, Raylib_cs.Color.GREEN);
-                                break;
-                            case PixelStatus.Water:
-                                Raylib.DrawRectangle(x, y, whx, why, Raylib_cs.Color.BLUE);
-                                break;
-                            case PixelStatus.City:
-                                Raylib.DrawRectangle(x, y, whx, why, Raylib_cs.Color.BLACK);
-                                break;
-                            case PixelStatus.Road:
-                                Raylib.DrawRectangle(x, y, whx, why, Raylib_cs.Color.GRAY);
-                                break;
-                        }
-                        whx = jumpX;
-                        why = jumpY;
-                        x = i;
-                        y = j;
-                        prevPixel = map[i][j];
+            int lineBeginY;
+            PixelStatus lineBeginStatus;
+
+            for (int x = 0; x < bmp.Width; x++) {
+                lineBeginY = 0;
+                lineBeginStatus = map[x][0].status;
+
+                for (int y = 0; y < bmp.Height; y++) {
+                    if (map[x][y].status != lineBeginStatus || y + 1 >= bmp.Height) {
+                        Raylib.DrawLine(x, lineBeginY, x, y + 1, pxStatusColors[lineBeginStatus]);
+                        lineBeginY = y;
+                        lineBeginStatus = map[x][y].status;
                     }
-                    why += jumpY;
                 }
-                whx += jumpX;
             }
         }
     }
