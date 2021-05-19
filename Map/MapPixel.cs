@@ -2,14 +2,17 @@ using System.Collections.Generic;
 
 namespace WorldTens.Map
 {
+    public enum PixelStatus {
+        City,
+        Grass,
+        Road,
+        Nuked,
+        Ruines,
+        Water,
+        Airport,
+    }
     public class MapPixel
     {
-        public bool city = false;
-        public bool grass = true;
-        public bool road = false; 
-        public bool nuked = false;
-        public bool ruines = false;
-        public bool water = false;
-        public bool airport = false;
+        public PixelStatus status = PixelStatus.Grass;
     }
 }

@@ -53,7 +53,16 @@ namespace WorldTens
 
                 Raylib.BeginDrawing();
 
-                if (iterTmp >= iterMax || iterations == 0) {
+                if (args.Length > 1 && (OperatingSystem.IsWindows() || args[1] == "opt" && args[1] != "normal")) {
+                    Raylib.ClearBackground(Color.WHITE);
+                    world.DrawOptimized();
+                    Raylib.DrawText("Good luck in WorldTens!", 10, 10, 14, Color.BLACK);
+                    Raylib.DrawText(iterations.ToString(), 0, screenHeight - 20, 20, Color.BLACK);
+                    Raylib.DrawText(world.GetTension().ToString(), screenWidth - 100, 10, 20, Color.BLACK);
+                    Raylib.DrawText("FPS: " + Raylib.GetFPS().ToString(), 350, 0, 20, Color.BLACK);
+                }
+
+                if (iterTmp >= iterMax || iterations == 0 || OperatingSystem.IsWindows() || (args.Length > 1 && args[1] == "redraw")) {
                     Raylib.ClearBackground(Color.WHITE);
                     for (int i = 0; i < world.map.Count; i++) {
                         for (int j = 0; j < world.map[i].Count; j++) {

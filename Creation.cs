@@ -63,7 +63,7 @@ namespace WorldTens
 
             CheckDetector(world);
             // Checks here
-            if (world.map[position.x][position.y].water) {
+            if (world.map[position.x][position.y].status == PixelStatus.Water) {
                 status = AIStatus.Move;
             }
 
@@ -76,17 +76,17 @@ namespace WorldTens
                 status = AIStatus.Reproduce;
             }
 
-            if (world.map[position.x][position.y].grass && !world.map[position.x][position.y].city && politStatus == PoliticalStatus.Builder) {
+            if (world.map[position.x][position.y].status == PixelStatus.Grass && world.map[position.x][position.y].status != PixelStatus.City && politStatus == PoliticalStatus.Builder) {
                 status = AIStatus.Build;
             }
-            else if (politStatus == PoliticalStatus.Civilian && !world.map[position.x][position.y].city){
+            else if (politStatus == PoliticalStatus.Civilian && world.map[position.x][position.y].status != PixelStatus.City){
                 status = AIStatus.Move;
             }
             else if (politStatus == PoliticalStatus.Builder || politStatus == PoliticalStatus.Soldier) {
                 status = AIStatus.Move;
             }
 
-            if (full <= 20 && world.map[position.x][position.y].city) {
+            if (full <= 20 && world.map[position.x][position.y].status == PixelStatus.City) {
                 status = AIStatus.Eat;
             }
 
@@ -157,18 +157,18 @@ namespace WorldTens
                 case AIStatus.Build:
                     progress += speedBuid * delta;
                     if (progress >= 100) {
-                        if (world.map[position.x][position.y].road) {
-                            world.map[position.x][position.y].city = true;
+                        if (world.map[position.x][position.y].status == PixelStatus.Road) {
+                            world.map[position.x][position.y].status = PixelStatus.City;
                         }
                         else {
-                            world.map[position.x][position.y].road = true;
+                            world.map[position.x][position.y].status = PixelStatus.Road;
                         }
                         progress = 0;
                         world.IncreaseTens(0.01f, country);
                     }
                     break;
                 case AIStatus.Eat:
-                    if (world.map[position.x][position.y].city) {
+                    if (world.map[position.x][position.y].status == PixelStatus.City) {
                         full += eatSpeed * delta;
                     }
                     else {
@@ -294,7 +294,7 @@ namespace WorldTens
         public Vector2 SearchCity(World world) {
             for (int i = position.x - searchRadius; i < position.x + searchRadius; i++) {
                 for (int j = position.y - searchRadius; j < position.y + searchRadius; j++) {
-                    if (world.map[i][j].city) {
+                    if (world.map[i][j].status == PixelStatus.City) {
                         return new Vector2(i, j);
                     }
                 }
@@ -307,7 +307,7 @@ namespace WorldTens
             if (random.Next(2) == 1) {
                 for (int i = position.x - searchRadius + random.Next(searchRadius); i < position.x + searchRadius; i++) {
                     for (int j = position.y - searchRadius + random.Next(searchRadius); j < position.y + searchRadius; j++) {
-                        if (world.map[i][j].grass && new Random().Next(40) == 1) {
+                        if (world.map[i][j].status == PixelStatus.Grass && new Random().Next(40) == 1) {
                             return new Vector2(i, j);
                         }
                     }
@@ -316,7 +316,7 @@ namespace WorldTens
             else {
                 for (int i = position.x + searchRadius * 2; i > position.x; i--) {
                     for (int j = position.y - searchRadius + random.Next(searchRadius); j < position.y + searchRadius; j++) {
-                        if (world.map[i][j].grass && new Random().Next(40) == 1) {
+                        if (world.map[i][j].status == PixelStatus.Grass && new Random().Next(40) == 1) {
                             return new Vector2(i, j);
                         }
                     }
