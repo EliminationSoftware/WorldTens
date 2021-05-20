@@ -56,6 +56,10 @@ namespace WorldTens
             this.mind = mind;
         }
 
+        public static int GCD(int a, int b) {
+            return b == 0 ? a : GCD(b, a % b);
+        }
+
         public void DoAction(float delta, World world) {
             if (!alive) {
                 return;
@@ -226,19 +230,24 @@ namespace WorldTens
         }
 
         private Vector2 GetDirection(Vector2 targetPos) {
+            const int speed = 1;
+            int dx = targetPos.x - position.x;
+            int dy = targetPos.y - position.y;
             Vector2 dir = new Vector2(0, 0);
-            if (position.x < targetPos.x) {
-                dir.x += 1;
+
+            if (Math.Abs(dx) > Math.Abs(dy)) {
+                dir.x = position.x < targetPos.x ? speed : -speed;
+                if (GCD(dx, dy) > 1) {
+                    dir.y = position.y < targetPos.y ? speed : -speed;
+                }
             }
             else {
-                dir.x -= 1;
+                dir.y = position.y < targetPos.y ? speed : -speed;
+                if (GCD(dx, dy) > 1) {
+                    dir.x = position.x < targetPos.x ? speed : -speed;
+                }
             }
-            if (position.y < targetPos.y) {
-                dir.y += 1;
-            }
-            else {
-                dir.y -= 1;
-            }
+
             return dir;
         }
 
